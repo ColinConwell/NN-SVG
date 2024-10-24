@@ -1,21 +1,28 @@
 <!doctype html>
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
 
 <head>
-    <!-- Global site tag (gtag.js) - Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-119008715-1"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-
-        gtag('config', 'UA-119008715-1');
-    </script>
+    <title>NN SVG</title>
+    <base href="/">
 
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
 
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/underscore@1.13.0/underscore-umd-min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/91/three.min.js"></script>
+    <script src="resources/scripts/OrbitControls.js"></script>
+    <script src="resources/scripts/Projector.js"></script>
+    <script src="resources/scripts/SVGRenderer.js"></script>
+
+    <script src="resources/scripts/util.js"></script>
+    <script src="resources/scripts/AlexNet.js"></script>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
     <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
 
     <style type="text/css">
@@ -70,9 +77,8 @@
         }
     </style>
 
-    <title>NN SVG</title>
-
 </head>
+
 <body>
 
     <div id="graph-container"></div>
@@ -89,8 +95,8 @@
 
                         <nav>
                             <div class="nav nav-tabs card-header-tabs" role="tablist">
-                                <a class="nav-item nav-link" href="index.html">FCNN style</a>
-                                <a class="nav-item nav-link" href="LeNet.html">LeNet style</a>
+                                <a class="nav-item nav-link" href="/content/FCNN.html">FCNN style</a>
+                                <a class="nav-item nav-link" href="/content/LeNet.html">LeNet style</a>
                                 <a class="nav-item nav-link active">AlexNet style</a>
                             </div>
                         </nav>
@@ -129,7 +135,7 @@
                                 <input type="color" value="#ffbbbb" id="color3">
                                 <label for="color3">Color 3</label>
                             </div>
-                            
+
                             <div>
                                 <label for="rectOpacity">Tensor Opacity</label>
                                 <input type="range" id="rectOpacity" name="" min="0" max="1" step="0.01" value="0.4" style="position: relative; top: 3px;">
@@ -146,6 +152,12 @@
                             <div>
                                 <label for="betweenLayers">Spacing Between Layers</label>
                                 <input type="range" id="betweenLayers" name="" min="10" max="100" step="1" value="20" style="position: relative; top: 3px;">
+                            </div>
+
+                            <div>
+                                <label for="rotation3D">3D Layer Rotation</label>
+                                <input type="range" id="rotation3D" name="" min="-45" max="45" step="1" value="0" style="position: relative; top: 3px;">
+                                <span id="rotationSpan">0°</span>
                             </div>
 
                             <hr>
@@ -306,163 +318,146 @@
 
     <div id="count"><a style="font-size: 1rem" href="about.html">About</a></div>
 
-
-
-    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
-
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/underscore@1.13.0/underscore-umd-min.js"></script>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/91/three.min.js"></script>
-    <script src="OrbitControls.js"></script>
-    <script src="SVGRenderer.js"></script>
-    <script src="Projector.js"></script>
-
-    <!-- We use locally cached copies of these in case the upstream versions change -->
-    <!-- <script src="https://threejs.org/examples/js/controls/OrbitControls.js"></script> -->
-    <!-- <script src="https://threejs.org/examples/js/renderers/Projector.js"></script> -->
-    <!-- <script src="https://threejs.org/examples/js/renderers/SVGRenderer.js"></script> -->
-    <!-- <script src="https://threejs.org/examples/js/renderers/CSS2DRenderer.js"></script> -->
-    <!-- <script src="https://threejs.org/examples/js/renderers/CSS3DRenderer.js"></script> -->
-
-    <script src="util.js"></script>
-    <script src="AlexNet.js"></script>
-
     <script type="text/javascript">
 
-alexnet = AlexNet();
+        alexnet = AlexNet();
 
-function restart() {
+        function restart() {
 
-    architecture = $('#architecture').find('.entry').map((i,el) =>
-        _.object(['height','width','depth','filterHeight','filterWidth','rel_x','rel_y'],
-                 $(el).find('input[type="number"]').map((j,input) => parseFloat($(input).val())).get().concat([rand(-0.4,0.4), rand(-0.4,0.4)]))
-        ).get()
-         .filter(layer => Object.values(layer).every(val => !_.isNaN(val)));
+            architecture = $('#architecture').find('.entry').map((i,el) =>
+                _.object(['height','width','depth','filterHeight','filterWidth','rel_x','rel_y'],
+                        $(el).find('input[type="number"]').map((j,input) => parseFloat($(input).val())).get().concat([rand(-0.4,0.4), rand(-0.4,0.4)]))
+                ).get()
+                .filter(layer => Object.values(layer).every(val => !_.isNaN(val)));
 
-    architecture2 = $('#architecture2').find('input').map((i,el) => $(el).val()).get().filter(input => $.isNumeric(input)).map(s => parseInt(s));
+            architecture2 = $('#architecture2').find('input').map((i,el) => $(el).val()).get().filter(input => $.isNumeric(input)).map(s => parseInt(s));
 
-    alexnet.redraw({'architecture_':architecture, 'architecture2_':architecture2});
+            alexnet.redraw({'architecture_':architecture, 'architecture2_':architecture2});
 
-}
+        }
 
-restart();
+        restart();
 
-// /////////////////////////////////////////////////////////////////////////////
-//                 ///////    Select Styling    ///////
-// /////////////////////////////////////////////////////////////////////////////
-
-
-$('#rendererType input:radio').change(function() {
-    rendererType = this.value;
-    if (rendererType == 'svg') {
-        showDims = false;
-        $("#showDims").prop('disabled', true).prop('checked', false);
-        $("#showConvDims").prop('disabled', true).prop('checked', false);
-        $("#download").removeClass('disabled');
-    }
-    else if (rendererType == 'webgl') {
-        $("#showDims").prop('disabled', false);
-        $("#showConvDims").prop('disabled', false);
-        $("#download").addClass('disabled');
-    }
-    $(this).blur();
-    alexnet.restartRenderer({'rendererType_':rendererType});
-});
-
-$("#color1").change(        function () { alexnet.style({'color1_': this.value}); });
-$("#color2").change(        function () { alexnet.style({'color2_': this.value}); });
-$("#color3").change(        function () { alexnet.style({'color3_': this.value}); });
-$("#fontScale").change(        function () { alexnet.style({'fontScale_': this.value}); });
-$("#rectOpacity").change(   function () { alexnet.style({'rectOpacity_': parseFloat(this.value)}); $(this).blur(); });
-$("#filterOpacity").change( function () { alexnet.style({'filterOpacity_': parseFloat(this.value)}); $(this).blur(); });
-$("#betweenLayers").change( function () { alexnet.redraw({'betweenLayers_': parseFloat(this.value)}); $(this).blur(); });
-$("#logDepth").change(      function () { alexnet.redraw({'logDepth_': this.checked}); });
-$("#depthScale").change(    function () { alexnet.redraw({'depthScale_': parseFloat(this.value)}); $(this).blur(); $("#depthSpan").text(this.value); });
-$("#logWidth").change(      function () { alexnet.redraw({'logWidth_': this.checked}); });
-$("#widthScale").change(    function () { alexnet.redraw({'widthScale_': parseFloat(this.value)}); $(this).blur(); $("#widthSpan").text(this.value); });
-$("#logConvSize").change(   function () { alexnet.redraw({'logConvSize_': this.checked}); });
-$("#convScale").change(     function () { alexnet.redraw({'convScale_': parseFloat(this.value)}); $(this).blur(); $("#convSpan").text(this.value); });
-$("#showDims").change(      function () { alexnet.redraw({'showDims_': this.checked}); });
-$("#showConvDims").change(  function () { alexnet.redraw({'showConvDims_': this.checked}); });
+        // /////////////////////////////////////////////////////////////////////////////
+        //                 ///////    Select Styling    ///////
+        // /////////////////////////////////////////////////////////////////////////////
 
 
-// /////////////////////////////////////////////////////////////////////////////
-//                  ///////    Select Architecture    ///////
-// /////////////////////////////////////////////////////////////////////////////
+        $('#rendererType input:radio').change(function() {
+            rendererType = this.value;
+            if (rendererType == 'svg') {
+                showDims = false;
+                $("#showDims").prop('disabled', true).prop('checked', false);
+                $("#showConvDims").prop('disabled', true).prop('checked', false);
+                $("#download").removeClass('disabled');
+            }
+            else if (rendererType == 'webgl') {
+                $("#showDims").prop('disabled', false);
+                $("#showConvDims").prop('disabled', false);
+                $("#download").addClass('disabled');
+            }
+            $(this).blur();
+            alexnet.restartRenderer({'rendererType_':rendererType});
+        });
+
+        $("#color1").change(        function () { alexnet.style({'color1_': this.value}); });
+        $("#color2").change(        function () { alexnet.style({'color2_': this.value}); });
+        $("#color3").change(        function () { alexnet.style({'color3_': this.value}); });
+        $("#fontScale").change(        function () { alexnet.style({'fontScale_': this.value}); });
+        $("#rectOpacity").change(   function () { alexnet.style({'rectOpacity_': parseFloat(this.value)}); $(this).blur(); });
+        $("#filterOpacity").change( function () { alexnet.style({'filterOpacity_': parseFloat(this.value)}); $(this).blur(); });
+        $("#betweenLayers").change( function () { alexnet.redraw({'betweenLayers_': parseFloat(this.value)}); $(this).blur(); });
+        $("#logDepth").change(      function () { alexnet.redraw({'logDepth_': this.checked}); });
+        $("#depthScale").change(    function () { alexnet.redraw({'depthScale_': parseFloat(this.value)}); $(this).blur(); $("#depthSpan").text(this.value); });
+        $("#logWidth").change(      function () { alexnet.redraw({'logWidth_': this.checked}); });
+        $("#widthScale").change(    function () { alexnet.redraw({'widthScale_': parseFloat(this.value)}); $(this).blur(); $("#widthSpan").text(this.value); });
+        $("#logConvSize").change(   function () { alexnet.redraw({'logConvSize_': this.checked}); });
+        $("#convScale").change(     function () { alexnet.redraw({'convScale_': parseFloat(this.value)}); $(this).blur(); $("#convSpan").text(this.value); });
+        $("#showDims").change(      function () { alexnet.redraw({'showDims_': this.checked}); });
+        $("#showConvDims").change(  function () { alexnet.redraw({'showConvDims_': this.checked}); });
 
 
-$(document).on('click', '#architecture .btn-add', function(e) {
-    e.preventDefault();
-
-    var controlForm = $('#architecture');
-    var currentEntry = $(this).parents('.entry:first');
-    var newEntry = $(currentEntry.clone()).appendTo(controlForm);
-
-    newEntry.find('input').val('');
-    controlForm.find('.entry:not(:last) .btn-add')
-        .removeClass('btn-add').addClass('btn-remove')
-        .removeClass('btn-primary').addClass('btn-secondary')
-        .html('<span class="fa fa-minus"></span>');
-
-    restart();
-
-});
-
-$(document).on('click', '#architecture .btn-remove', function(e) {
-    e.preventDefault();
-
-    $(this).parents('.entry:first').remove();
-
-    restart();
-
-    return false;
-
-});
-
-$(document).on('click', '#architecture2 .btn-add', function(e) {
-    e.preventDefault();
-
-    var controlForm = $('#architecture2');
-    var currentEntry = $(this).parents('.entry:first');
-    var newEntry = $(currentEntry.clone()).appendTo(controlForm);
-
-    newEntry.find('input').val('');
-    controlForm.find('.entry:not(:last) .btn-add')
-        .removeClass('btn-add').addClass('btn-remove')
-        .removeClass('btn-primary').addClass('btn-secondary')
-        .html('<span class="fa fa-minus"></span>');
-
-    restart();
-
-});
-
-$(document).on('click', '#architecture2 .btn-remove', function(e) {
-    e.preventDefault();
-
-    $(this).parents('.entry:first').remove();
-
-    restart();
-
-    return false;
-
-});
-
-$(document).on('change', 'input', function(e) {
-    e.preventDefault();
-
-    restart();
-});
+        // /////////////////////////////////////////////////////////////////////////////
+        //                  ///////    Select Architecture    ///////
+        // /////////////////////////////////////////////////////////////////////////////
 
 
-$("#download").on("click", function() {
-    // ga('send', 'event', 'downloadSVG', 'AlexNet');
+        $(document).on('click', '#architecture .btn-add', function(e) {
+            e.preventDefault();
 
-    $(this).attr("href", 'data:application/octet-stream;base64,' + btoa(unescape(encodeURIComponent($('<div>').append($( $("#graph-container").html()).attr("xmlns", "http://www.w3.org/2000/svg") ).html()))))
-           .attr("download", "nn.svg")
-});
+            var controlForm = $('#architecture');
+            var currentEntry = $(this).parents('.entry:first');
+            var newEntry = $(currentEntry.clone()).appendTo(controlForm);
 
+            newEntry.find('input').val('');
+            controlForm.find('.entry:not(:last) .btn-add')
+                .removeClass('btn-add').addClass('btn-remove')
+                .removeClass('btn-primary').addClass('btn-secondary')
+                .html('<span class="fa fa-minus"></span>');
+
+            restart();
+
+        });
+
+        $(document).on('click', '#architecture .btn-remove', function(e) {
+            e.preventDefault();
+
+            $(this).parents('.entry:first').remove();
+
+            restart();
+
+            return false;
+
+        });
+
+        $(document).on('click', '#architecture2 .btn-add', function(e) {
+            e.preventDefault();
+
+            var controlForm = $('#architecture2');
+            var currentEntry = $(this).parents('.entry:first');
+            var newEntry = $(currentEntry.clone()).appendTo(controlForm);
+
+            newEntry.find('input').val('');
+            controlForm.find('.entry:not(:last) .btn-add')
+                .removeClass('btn-add').addClass('btn-remove')
+                .removeClass('btn-primary').addClass('btn-secondary')
+                .html('<span class="fa fa-minus"></span>');
+
+            restart();
+
+        });
+
+        $(document).on('click', '#architecture2 .btn-remove', function(e) {
+            e.preventDefault();
+
+            $(this).parents('.entry:first').remove();
+
+            restart();
+
+            return false;
+
+        });
+
+        $(document).on('change', 'input', function(e) {
+            e.preventDefault();
+
+            restart();
+        });
+
+
+        $("#download").on("click", function() {
+            // ga('send', 'event', 'downloadSVG', 'AlexNet');
+
+            $(this).attr("href", 'data:application/octet-stream;base64,' + btoa(unescape(encodeURIComponent($('<div>').append($( $("#graph-container").html()).attr("xmlns", "http://www.w3.org/2000/svg") ).html()))))
+                .attr("download", "nn.svg")
+        });
+
+        $("#rotation3D").change(function () {
+            var rotation = parseFloat(this.value);
+            alexnet.redraw({'rotation3D_': rotation});
+            $(this).blur();
+            $("#rotationSpan").text(rotation + "°");
+        });
 
     </script>
 

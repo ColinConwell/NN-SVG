@@ -12,7 +12,7 @@ The tool provides the ability to generate figures of three kinds: classic Fully-
 
 I hope this tool will save machine learning researchers time, and I hope this software might also serve as a pedagogical tool in some contexts.
 
-<img src="./example.svg">
+<img src="./images/example.svg">
 
 
 ### Citation
